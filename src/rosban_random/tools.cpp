@@ -53,7 +53,7 @@ std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
 
 std::vector<double> getUniformSamples(double min,
                                       double max,
-                                      size_t nbSamples,
+                                      size_t nb_samples,
                                       std::default_random_engine * engine)
 {
   bool cleanAtEnd = false;
@@ -62,9 +62,9 @@ std::vector<double> getUniformSamples(double min,
     engine = newRandomEngine();
   }
   std::vector<double> result;
-  result.reserve(nbSamples);
+  result.reserve(nb_samples);
   std::uniform_real_distribution<double> distrib(min, max);
-  for (size_t sId = 0; sId < nbSamples; sId++) {
+  for (size_t sId = 0; sId < nb_samples; sId++) {
     result.push_back(distrib(*engine));
   }
   if (cleanAtEnd)
@@ -74,7 +74,7 @@ std::vector<double> getUniformSamples(double min,
 }
 
 std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
-                                               size_t nbSamples,
+                                               size_t nb_samples,
                                                std::default_random_engine * engine)
 {
   bool cleanAtEnd = false;
@@ -83,14 +83,14 @@ std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
     engine = newRandomEngine();
   }
   std::vector<Eigen::VectorXd> result;
-  result.reserve(nbSamples);
+  result.reserve(nb_samples);
   std::vector<std::uniform_real_distribution<double>> distribs;
   for (int i = 0; i < limits.rows(); i++)
   {
     std::uniform_real_distribution<double> d(limits(i,0), limits(i,1));
     distribs.push_back(d);
   }
-  for (size_t sId = 0; sId < nbSamples; sId++) {
+  for (size_t sId = 0; sId < nb_samples; sId++) {
     Eigen::VectorXd sample(limits.rows());
     for (size_t dim = 0; dim < distribs.size(); dim++) {
       sample(dim) = distribs[dim](*engine);
@@ -99,6 +99,21 @@ std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
   }
   if (cleanAtEnd)
     delete(engine);
+  return result;
+}
+
+Eigen::MatrixXd getUniformSamplesMatrix(const Eigen::MatrixXd& limits,
+                                        size_t nb_samples,
+                                        std::default_random_engine * engine)
+{
+  // Get samples
+  std::vector<Eigen::VectorXd> tmp = getUniformSamples(limits, nb_samples, engine);
+  // Change layout
+  Eigen::MatrixXd result(limits.rows(), nb_samples);
+  for (int i = 0; i < nb_samples; i++)
+  {
+    result.col(i) = tmp[i];
+  }
   return result;
 }
 
