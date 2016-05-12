@@ -12,6 +12,12 @@ std::default_random_engine getRandomEngine()
   return std::default_random_engine(seed);
 }
 
+std::default_random_engine * newRandomEngine()
+{
+  unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
+  return new std::default_random_engine(seed);
+}
+
 std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
                                       std::default_random_engine * engine)
 {
@@ -20,8 +26,7 @@ std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
   bool cleanAtEnd = false;
   if (engine == NULL) {
     cleanAtEnd = true;
-    unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
-    engine = new std::default_random_engine(seed);
+    engine = newRandomEngine();
   }
   // preparing structure
   std::vector<size_t> chosenIndex;
@@ -46,6 +51,28 @@ std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
   return chosenIndex;
 }
 
+std::vector<double> getUniformSamples(double min,
+                                      double max,
+                                      size_t nbSamples,
+                                      std::default_random_engine * engine)
+{
+  bool cleanAtEnd = false;
+  if (engine == NULL) {
+    cleanAtEnd = true;
+    engine = newRandomEngine();
+  }
+  std::vector<double> result;
+  result.reserve(nbSamples);
+  std::uniform_real_distribution<double> distrib(min, max);
+  for (size_t sId = 0; sId < nbSamples; sId++) {
+    result.push_back(distrib(*engine));
+  }
+  if (cleanAtEnd)
+    delete(engine);
+  return result;
+
+}
+
 std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
                                                size_t nbSamples,
                                                std::default_random_engine * engine)
@@ -53,12 +80,10 @@ std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
   bool cleanAtEnd = false;
   if (engine == NULL) {
     cleanAtEnd = true;
-    unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
-    engine = new std::default_random_engine(seed);
+    engine = newRandomEngine();
   }
   std::vector<Eigen::VectorXd> result;
   result.reserve(nbSamples);
-  auto generator = getRandomEngine();
   std::vector<std::uniform_real_distribution<double>> distribs;
   for (int i = 0; i < limits.rows(); i++)
   {
@@ -68,7 +93,7 @@ std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
   for (size_t sId = 0; sId < nbSamples; sId++) {
     Eigen::VectorXd sample(limits.rows());
     for (size_t dim = 0; dim < distribs.size(); dim++) {
-      sample(dim) = distribs[dim](generator);
+      sample(dim) = distribs[dim](*engine);
     }
     result.push_back(sample);
   }
