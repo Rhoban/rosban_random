@@ -10,6 +10,14 @@ namespace rosban_random
 std::default_random_engine getRandomEngine();
 std::default_random_engine * newRandomEngine();
 
+/// Return a vector of random_engines initialized with different seeds, if
+/// engine is provided, then it is used to generate the random engines,
+/// otherwise a new random_engine is created.
+/// This function is particularly important to work with stochastic functions in
+/// parallel
+std::vector<std::default_random_engine> getRandomEngines(int nb_engines,
+                                                         std::default_random_engine * engine = NULL);
+
 /// Create its own engine if no engine is provided
 std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
                                       std::default_random_engine * engine = NULL);

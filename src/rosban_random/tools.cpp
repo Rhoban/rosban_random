@@ -18,6 +18,28 @@ std::default_random_engine * newRandomEngine()
   return new std::default_random_engine(seed);
 }
 
+std::vector<std::default_random_engine> getRandomEngines(int nb_engines,
+                                                         std::default_random_engine * engine)
+{
+  std::vector<std::default_random_engine> result(nb_engines);
+  bool cleanAtEnd = false;
+  if (engine == NULL) {
+    cleanAtEnd = true;
+    engine = newRandomEngine();
+  }
+  unsigned int min = std::numeric_limits<unsigned int>::lowest();
+  unsigned int max = std::numeric_limits<unsigned int>::max();
+  std::uniform_int_distribution<unsigned int> seed_distrib(min, max);
+  for (int i = 0; i < nb_engines; i++)
+  {
+    result[i].seed(seed_distrib(*engine));
+  }
+  if (cleanAtEnd) {
+    delete(engine);
+  }
+  return result;
+}
+
 std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
                                       std::default_random_engine * engine)
 {
