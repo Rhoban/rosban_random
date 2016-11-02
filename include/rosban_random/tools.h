@@ -2,6 +2,7 @@
 
 #include <Eigen/Core>
 
+#include <map>
 #include <random>
 
 namespace rosban_random
@@ -38,5 +39,17 @@ Eigen::MatrixXd getUniformSamplesMatrix(const Eigen::MatrixXd& limits,
                                         size_t nb_samples,
                                         std::default_random_engine * engine = NULL);
 
+
+/// Given a vector of weight W, return a sample containing 'nb_samples' indices
+/// with for each element: p(i) = W[i] / sum(W)
+std::vector<int> sampleWeightedIndices(const std::vector<double> & weights,
+                                       int nb_samples,
+                                       std::default_random_engine * engine);
+
+/// Return a map with for each index its number of occurences
+/// cf sampleWeightedIndices
+std::map<int,int> sampleWeightedIndicesMap(const std::vector<double> & weights,
+                                           int nb_samples,
+                                           std::default_random_engine * engine);
 
 }

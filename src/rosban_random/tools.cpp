@@ -139,4 +139,60 @@ Eigen::MatrixXd getUniformSamplesMatrix(const Eigen::MatrixXd& limits,
   return result;
 }
 
+
+std::vector<int> sampleWeightedIndices(const std::vector<double> & weights,
+                                       int nb_samples,
+                                       std::default_random_engine * engine)
+{
+  std::vector<double> summed_weights(weights.size());
+  double sum = 0.0;
+  for (size_t i=0; i < weights.size(); i++) {
+    sum += weights[i];
+    summed_weights[i] = sum;
+  }
+
+  if (sum <= 0.0) {
+    std::ostringstream oss;
+    oss << "sampleWeightedIndices: Negative or null sum for the weights: " << sum << std::endl;
+    throw std::runtime_error(oss.str());
+  }
+
+  // Preparing the indices
+  std::uniform_real_distribution<double> distrib(0.0, sum);
+  std::vector<int> indices(weights.size());
+  for (unsigned int i = 0; i < weights.size(); i++) {
+    double rand_val = distrib(*engine);
+    // Finding index with a dichotomic method
+    int start = 0;
+    int end = weights.size();
+    while (start != end){
+      int pivot = (end + start) / 2;
+      if (summed_weights[pivot] < rand_val){
+        start = pivot + 1;
+      }
+      else{
+        end = pivot;
+      }
+    }
+    indices[i] = start;
+  }
+  return indices;
+}
+
+std::map<int,int> sampleWeightedIndicesMap(const std::vector<double> & weights,
+                                           int nb_samples,
+                                           std::default_random_engine * engine)
+{
+  std::map<int,int> indices_occurences;
+  std::vector<int> indices = sampleWeightedIndices(weights, nb_samples, engine);
+  for(int idx : indices)
+  {
+    if (indices_occurences.count(idx) == 0)
+      indices_occurences[idx] = 1;
+    else
+      indices_occurences[idx] += 1;
+  }
+  return indices_occurences;
+}
+
 }
