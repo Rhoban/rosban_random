@@ -3,19 +3,19 @@ project(rosban_random)
 
 find_package(catkin REQUIRED)
 
-find_package(Eigen3 REQUIRED)
+find_package(Eigen REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rosban_random
-  DEPENDS Eigen3
+  DEPENDS Eigen
 )
 
 include_directories(
   include
-  ${EIGEN3_INCLUDE_DIR}
+  ${EIGEN_INCLUDE_DIR}
   )
 
 set(DIRECTORIES
