@@ -159,8 +159,8 @@ std::vector<int> sampleWeightedIndices(const std::vector<double> & weights,
 
   // Preparing the indices
   std::uniform_real_distribution<double> distrib(0.0, sum);
-  std::vector<int> indices(weights.size());
-  for (unsigned int i = 0; i < weights.size(); i++) {
+  std::vector<int> indices(nb_samples);
+  for (unsigned int i = 0; i < nb_samples; i++) {
     double rand_val = distrib(*engine);
     // Finding index with a dichotomic method
     int start = 0;
