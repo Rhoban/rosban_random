@@ -10,8 +10,8 @@ MultiVariateGaussian::MultiVariateGaussian()
 }
 
 MultiVariateGaussian::MultiVariateGaussian(const Eigen::VectorXd & mu_,
-                                           const Eigen::MatrixXd & sigma_)
-  : mu(mu_), sigma(sigma_)
+                                           const Eigen::MatrixXd & covar_)
+  : mu(mu_), covar(covar_)
 {
   updateCholesky();
 }
@@ -27,14 +27,24 @@ Eigen::VectorXd MultiVariateGaussian::getSample(std::default_random_engine & eng
   return mu + cholesky * random_vector;
 }
 
+Eigen::MatrixXd MultiVariateGaussian::getSamples(int nb_samples,
+                                                 std::default_random_engine & engine) const
+{
+  Eigen::MatrixXd result(mu.rows(), nb_samples);
+  for (int i = 0; i < nb_samples; i++) {
+    result.col(i) = getSample(engine);
+  }
+  return result;
+}
+
 void MultiVariateGaussian::updateCholesky()
 {
   //WARNING: according to Rasmussen 2006, it might be necessary to add epsilon * I
   //         before computing cholesky
   double epsilon = std::pow(10, -10);
   Eigen::MatrixXd I;
-  I = Eigen::MatrixXd::Identity(sigma.rows(), sigma.rows());
-  cholesky = Eigen::LLT<Eigen::MatrixXd>(sigma + epsilon * I).matrixL();
+  I = Eigen::MatrixXd::Identity(covar.rows(), covar.rows());
+  cholesky = Eigen::LLT<Eigen::MatrixXd>(covar + epsilon * I).matrixL();
 }
 
 }
