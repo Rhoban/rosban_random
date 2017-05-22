@@ -1,22 +1,20 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rosban_random)
 
-find_package(catkin REQUIRED)
-
-find_package(PkgConfig)
-pkg_search_module(Eigen3 REQUIRED eigen3)
+find_package(catkin REQUIRED COMPONENTS
+  Eigen)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rosban_random
-  DEPENDS Eigen3
+  CATKIN_DEPENDS Eigen
 )
 
 include_directories(
   include
-  ${Eigen3_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
   )
 
 set(DIRECTORIES
