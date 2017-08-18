@@ -39,8 +39,13 @@ public:
   /// Access to the vector specifiying for each dimension if it is circular
   const Eigen::VectorXi& getCircularity() const;
 
-  /// Sample a vector from the multivariate gaussian with given random engine
-  Eigen::VectorXd sample(std::default_random_engine * engine) const;
+  /// Sample a point from the multivariate gaussian with given random engine
+  Eigen::VectorXd getSample(std::default_random_engine * engine) const;
+
+  /// Sample multiple points from the multivariate gaussian with given random engine
+  /// Each column is a different point
+  Eigen::MatrixXd getSamples(int nb_samples,
+                             std::default_random_engine * engine) const;
 
   /// Return the density of probability at 'point' given the distribution
   /// parameters.
@@ -61,27 +66,26 @@ public:
 private:
 
   /// The mean vector
-  Eigen::VectorXd _mean;
+  Eigen::VectorXd mu;
   
   /// The covariance matrix (symetrix definite positive)
-  Eigen::MatrixXd _covariance;
+  Eigen::MatrixXd covar;
   
   /// Not null integer for each dimension where the represented value is an angle
   /// in radian in [-pi,pi].
-  Eigen::VectorXi _isCircular;
+  Eigen::VectorXi dims_circularity;
 
   /// Does the distribution has at least one circular dimension
-  bool _hasCircular;
+  bool has_circular;
   
   /// The inverse of covariance matrix computed through cholesky decomposition
-  Eigen::MatrixXd _covarianceInv;
+  Eigen::MatrixXd covar_inv;
   
   /// The left side of the Cholesky decomposition of the covariance matrix
-  Eigen::MatrixXd _choleskyDecomposition;
+  Eigen::MatrixXd cholesky;
   
-  /// The determinant of the 
-  /// covariance matrix
-  double _determinant;
+  /// The determinant of the covariance matrix
+  double determinant;
   
   /// Compute the covariance decomposition and update internal variables
   void computeDecomposition();
