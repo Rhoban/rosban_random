@@ -29,6 +29,9 @@ std::vector<double> getUniformSamples(double min,
                                       size_t nb_samples,
                                       std::default_random_engine * engine = NULL);
 
+Eigen::VectorXd getUniformSample(const Eigen::MatrixXd& limits,
+                                 std::default_random_engine * engine = NULL);
+
 /// Create its own engine if no engine is provided
 std::vector<Eigen::VectorXd> getUniformSamples(const Eigen::MatrixXd& limits,
                                                size_t nb_samples,
