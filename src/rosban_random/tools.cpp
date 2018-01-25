@@ -73,6 +73,46 @@ std::vector<size_t> getKDistinctFromN(size_t k, size_t n,
   return chosenIndex;
 }
 
+std::vector<std::vector<size_t>> splitIndices(size_t max_index,
+                                              const std::vector<size_t> & set_sizes,
+                                              std::default_random_engine * engine)
+{
+  size_t total_set_size = 0;
+  for (size_t set_size : set_sizes) {
+    total_set_size += set_size;
+  }
+  if (total_set_size > max_index + 1) {
+    std::ostringstream oss;
+    oss << "rosban_utils::splitIndices: available_indices (" << (max_index+1)
+        << ") is smaller than total set size (" << total_set_size << ")";
+    throw std::logic_error(oss.str());
+  }
+
+  bool cleanAtEnd = false;
+  if (engine == NULL) {
+    cleanAtEnd = true;
+    engine = newRandomEngine();
+  }
+  std::vector<size_t> all_indices(max_index+1);
+  for (int i = 0; i <= max_index; i++) {
+    all_indices[i] = i;
+  }
+  std::shuffle(all_indices.begin(), all_indices.end(), *engine);
+  std::vector<std::vector<size_t>> result(set_sizes.size());
+  int idx = 0;
+  for (size_t set_idx = 0; set_idx < set_sizes.size(); set_idx++) {
+    int last_index = idx + set_sizes[set_idx] - 1;
+    while (idx <= last_index) {
+      result[set_idx].push_back(all_indices[idx]);
+      idx++;
+    }
+  }
+  if (cleanAtEnd) {
+    delete(engine);
+  }
+  return result;
+}
+
 std::vector<double> getUniformSamples(double min,
                                       double max,
                                       size_t nb_samples,
